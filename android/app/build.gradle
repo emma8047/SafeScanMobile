@@ -1,11 +1,13 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: "com.facebook.react"
+//apply plugin: "com.facebook.react"
+apply plugin: "com.google.gms.google-services"
 
-/**
+
+/*
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
- */
+/* 
 react {
     /* Folders */
     //   The root of your project, i.e. where "package.json" lives. Default is '../..'
@@ -51,8 +53,8 @@ react {
     // hermesFlags = ["-O", "-output-source-map"]
 
     /* Autolinking */
-    autolinkLibrariesWithApp()
-}
+    //autolinkLibrariesWithApp()
+//}
 
 /**
  * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
@@ -71,13 +73,17 @@ def enableProguardInReleaseBuilds = false
  * this variant is about 6MiB larger per architecture than default.
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+//Added for test
+def hermesEnabled = true
 
 android {
-    ndkVersion rootProject.ext.ndkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-    compileSdk rootProject.ext.compileSdkVersion
+    //ndkVersion rootProject.ext.ndkVersion
+    //targetSdkVersion rootProject.ext.targetSdkVersion
 
     namespace "com.safescanmobile"
+
     defaultConfig {
         applicationId "com.safescanmobile"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -107,7 +113,15 @@ android {
     }
 }
 
+
 dependencies {
+
+    implementation platform('com.google.firebase:firebase-bom:34.6.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    //implementation 'com.google.firebase:firebase-auth:22.1.1'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 

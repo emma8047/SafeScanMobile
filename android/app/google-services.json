@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "862717344226",
+    "project_id": "safescan-f43c1",
+    "storage_bucket": "safescan-f43c1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862717344226:android:67b2b94454c475a74f21bb",
+        "android_client_info": {
+          "package_name": "com.emma8047.safescan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDV1Oj6OjMReUHSHy7KI2MahPhBxbcsBlc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862717344226:android:e4bd0d8a64f640854f21bb",
+        "android_client_info": {
+          "package_name": "com.seniorproject.SafeScanMobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDV1Oj6OjMReUHSHy7KI2MahPhBxbcsBlc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
