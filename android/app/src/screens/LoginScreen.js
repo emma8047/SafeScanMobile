@@ -4,10 +4,12 @@ import { auth } from '../firebase/config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
+
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Login
   const handleLogin = () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please enter email and password');
@@ -17,12 +19,14 @@ export default function LoginScreen({ navigation }) {
 
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
-        navigation.replace('Dashboard'); // login successful
+        navigation.replace('Dashboard');
       })
       .catch(error => {
         Alert.alert('Login Failed', error.message);
       });
   };
+
+  // Register
   const handleSignUp = () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please enter email and password');
@@ -38,6 +42,7 @@ export default function LoginScreen({ navigation }) {
       });
   };
 
+  // Page Setup
   return (
     <View style={styles.container}>
       <Text style={styles.title}>SafeScan Login</Text>
