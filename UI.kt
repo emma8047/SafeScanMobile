@@ -1,451 +1,344 @@
-package com.example.securitydashboard
+package com.example.safescan
 
-import android.os.Bundle
-import android.content.Context
-import android.content.pm.ApplicationInfo
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
-import androidx.compose.material3.*
-import androidx.compose.material.icons.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.platform.*
-import androidx.compose.ui.text.font.*
-import androidx.compose.ui.text.style.*
-import kotlinx.coroutines.delay
-import androidx.compose.ui.graphics.drawscope.*
-import androidx.compose.ui.draw.*
-import androidx.compose.ui.window.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.layout.*
-import androidx.compose.ui.graphics.painter.*
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.text.*
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 
-class MainActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-
-            SecurityApp()
-
-        }
-    }
-}
-
-@BottomPart
+//bottomPart
+@Composable
 fun SafeScanApp() {
 
     var screen by remember { mutableStateOf("dashboard") }
 
-    var risk by remember { mutableStateOf(0.1f) }
+    val threatCount by remember { derivedStateOf { ThreatManager.threatCount } }
 
     Scaffold(
-
         bottomBar = {
-
             NavigationBar {
 
                 NavigationBarItem(
                     selected = screen == "dashboard",
                     onClick = { screen = "dashboard" },
-                    icon = { Icon(Icons.Default.Home,"") },
+                    icon = { Icon(Icons.Default.Home, "") },
                     label = { Text("Dashboard") }
                 )
 
                 NavigationBarItem(
                     selected = screen == "scan",
                     onClick = { screen = "scan" },
-                    icon = { Icon(Icons.Default.Search,"") },
+                    icon = { Icon(Icons.Default.Search, "") },
                     label = { Text("Scan") }
                 )
 
                 NavigationBarItem(
                     selected = screen == "tasks",
                     onClick = { screen = "tasks" },
-                    icon = { Icon(Icons.Default.List,"") },
+                    icon = { Icon(Icons.AutoMirrored.Filled.List, "") },
                     label = { Text("Tasks") }
                 )
 
                 NavigationBarItem(
                     selected = screen == "quarantine",
                     onClick = { screen = "quarantine" },
-                    icon = { Icon(Icons.Default.Warning,"") },
+                    icon = { Icon(Icons.Default.Warning, "") },
                     label = { Text("Quarantine") }
                 )
 
                 NavigationBarItem(
                     selected = screen == "reports",
                     onClick = { screen = "reports" },
-                    icon = { Icon(Icons.Default.Info,"") },
+                    icon = { Icon(Icons.Default.Info, "") },
                     label = { Text("Reports") }
                 )
-
             }
-
         }
-
     ) { padding ->
 
-        Box(modifier = Modifier.padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
 
-            when(screen) {
+            when (screen) {
 
-                "dashboard" -> DashboardScreen(risk) { risk = it }
+                "dashboard" -> DashboardScreen(threatCount) {}
 
-                "scan" -> ScanScreen()
+                "scan" -> ScanScreen {
+                    // TODO: implication
+                }
 
                 "tasks" -> TaskManagerScreen()
 
                 "quarantine" -> QuarantineScreen()
 
                 "reports" -> ReportsScreen()
+            }
+        }
+    }
+}
+//Dashboard
+@Composable
+fun DashboardScreen(threatCount: Int, onThreatUpdate: (Int) -> Unit) {
 
+    val color = when {
+        threatCount <= 0 -> Color.Green
+        threatCount in 1..3 -> Color.Yellow
+        else -> Color.Red
+    }
+
+    val text = when {
+        threatCount <= 0 -> "Secure"
+        threatCount in 1..3 -> "Threat"
+        else -> "Danger"
+    }
+
+    Column(Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black)
+                .padding(16.dp)
+        ) {
+            Text("SafeScan", color = Color.White, fontSize = 20.sp)
+        }
+
+        Spacer(Modifier.height(40.dp))
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+
+            Canvas(modifier = Modifier.size(220.dp)) {
+                drawArc(
+                    color = color,
+                    startAngle = -90f,
+                    sweepAngle = 360f,
+                    useCenter = false,
+                    style = Stroke(40f)
+                )
             }
 
+            Text(text, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         }
-
     }
-
 }
 
-@DashboardPart
-fun DashboardScreen() {
+// implication
+object ThreatManager {
+    var threatCount by mutableStateOf(0)
 
-    var risk by remember { mutableStateOf(0.3f) }
+    fun updateThreat(count: Int) {
+        threatCount = count
+    }
+}
 
-    LaunchedEffect(Unit){
 
-        while(true){
+//ScanPart
+@Composable
+fun ScanScreen(onStartScan: () -> Unit) {
 
-            risk = (10..90).random() / 100f
-            delay(2000)
+    Column(Modifier.fillMaxSize()) {
 
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black)
+                .padding(16.dp)
+        ) {
+            Text("Scan", color = Color.White)
         }
-
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ){
-
-        Text(
-            "System Risk Level",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(Modifier.height(30.dp))
-
-        RiskCircle(risk)
-
-    }
-
-}
-
-@RiskCirclePart
-@InsideDashboardPart
-fun RiskCircle(risk: Float) {
-
-    Canvas(
-        modifier = Modifier.size(220.dp)
-    ){
-
-        val sweep = risk * 360f
-
-        drawArc(
-            color = Color.Green,
-            startAngle = -90f,
-            sweepAngle = 360f - sweep,
-            useCenter = false,
-            style = Stroke(40f)
-        )
-
-        drawArc(
-            color = Color.Red,
-            startAngle = -90f + (360f - sweep),
-            sweepAngle = sweep,
-            useCenter = false,
-            style = Stroke(40f)
-        )
-
-    }
-
-}
-
-data class AppInfo(
-
-    val name:String,
-    val packageName:String,
-    val version:String,
-    val icon:Drawable
-
-)
-
-fun getInstalledApps(context: Context): List<AppInfo> {
-
-    val pm = context.packageManager
-
-    val apps = pm.getInstalledApplications(0)
-
-    return apps.map {
-
-        val name = pm.getApplicationLabel(it).toString()
-
-        val version = try {
-            pm.getPackageInfo(it.packageName,0).versionName ?: "1.0"
-        } catch (e:Exception){
-            "1.0"
-        }
-
-        val icon = pm.getApplicationIcon(it)
-
-        AppInfo(name,it.packageName,version,icon)
-
-    }.sortedBy { it.name }
-
-}
-
-@ScanPart
-fun ScanScreen() {
-
-    var scanning by remember { mutableStateOf(false) }
-
-    var text by remember { mutableStateOf("Press Start") }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
-    ) {
 
         Spacer(Modifier.height(100.dp))
 
-        Text(text, fontSize = 30.sp)
-
-        Spacer(Modifier.height(30.dp))
-
-        Button(onClick = {
-
-            scanning = true
-            text = "Scanning..."
-
-        }) {
-
-            Text("Start Scan")
-
-        }
-
-        if(scanning) {
-
-            LaunchedEffect(Unit) {
-
-                delay(2000)
-
-                text = "SYSTEM CHECK COMPLETE"
-
-                scanning = false
-
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Button(onClick = {
+                // TODO: implication
+                onStartScan()
+            }) {
+                Text("System Check")
             }
-
         }
-
     }
-
 }
 
 
-@TaskManagerPart
+
+//TaskManagerPart
+@Composable
 fun TaskManagerScreen() {
 
     val context = LocalContext.current
-
     var apps by remember { mutableStateOf<List<AppInfo>>(emptyList()) }
-
     var selected by remember { mutableStateOf<AppInfo?>(null) }
 
-    LaunchedEffect(Unit){
-
+    LaunchedEffect(Unit) {
         apps = getInstalledApps(context)
-
-        if(apps.isNotEmpty())
-            selected = apps[0]
-
     }
 
-    LazyColumn{
+    Column {
 
-        items(apps){
-
-            ListItem(
-
-                headlineContent = { Text(it.name) },
-
-                supportingContent = { Text(it.packageName) },
-
-                leadingContent = {
-
-                    Image(
-                        painter = rememberDrawablePainter(it.icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(32.dp)
-                    )
-
-                },
-
-                modifier = Modifier.clickable {
-
-                    selected = it
-
-                }
-
-            )
-
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black)
+                .padding(16.dp)
+        ) {
+            Text("Task Manager", color = Color.White)
         }
 
+        LazyColumn {
+            items(apps) { app ->
+                ListItem(
+                    headlineContent = { Text(app.name) },
+                    leadingContent = {
+                        Image(
+                            painter = painterResource(android.R.drawable.sym_def_app_icon),
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    },
+                    modifier = Modifier.clickable { selected = app }
+                )
+            }
+        }
     }
 
     selected?.let {
-
-        AppDetailDialog(it)
-
+        AppDetailDialog(it) { selected = null }
     }
-
 }
 
-@InsideTaskManagerPart
-fun AppDetailDialog(app: AppInfo) {
+@Composable
+fun AppDetailDialog(app: AppInfo, onClose: () -> Unit) {
 
-    var cpu by remember { mutableStateOf(5) }
-    var ram by remember { mutableStateOf(120) }
+    val context = LocalContext.current
 
-    LaunchedEffect(Unit){
-
-        while(true){
-
-            cpu = (1..30).random()
-            ram = (80..500).random()
-
-            delay(1200)
-
+    val size = remember {
+        try {
+            val file = context.packageManager
+                .getApplicationInfo(app.packageName, 0)
+                .sourceDir
+            java.io.File(file).length() / (1024 * 1024)
+        } catch (e: Exception) {
+            0
         }
-
     }
 
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .background(Color(0x88000000))
-    ){
+    Dialog(onDismissRequest = onClose) {
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ){
+        Card {
+            Column(Modifier.padding(20.dp)) {
 
-            Column(
-                Modifier.padding(20.dp)
-            ){
+                Text(app.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
-                Row(verticalAlignment = Alignment.CenterVertically){
+                Spacer(Modifier.height(10.dp))
 
+                Text("Size: ${size} MB")
+
+                Spacer(Modifier.height(20.dp))
+
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
                     Image(
-                        painter = rememberDrawablePainter(app.icon),
+                        painter = painterResource(android.R.drawable.sym_def_app_icon),
                         contentDescription = null,
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(60.dp)
                     )
-
-                    Spacer(Modifier.width(12.dp))
-
-                    Text(
-                        app.name,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-
                 }
-
-                Spacer(Modifier.height(16.dp))
-
-                Text("Package: ${app.packageName}")
-
-                Spacer(Modifier.height(6.dp))
-
-                Text("Version: ${app.version}")
-
-                Spacer(Modifier.height(16.dp))
-
-                Text("CPU Usage: $cpu%")
-
-                LinearProgressIndicator(
-                    progress = cpu / 100f,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                Text("RAM Usage: $ram MB")
-
             }
-
         }
-
     }
-
 }
 
-@QuarantinePart
+
+//QuarantinePart
+@Composable
 fun QuarantineScreen() {
 
     Column {
 
-        ListItem(
-            headlineContent = { Text("Sketchy Cleaner") },
-            supportingContent = { Text("Suspicious network activity") }
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black)
+                .padding(16.dp)
+        ) {
+            Text("Quarantine", color = Color.White)
+        }
 
-        ListItem(
-            headlineContent = { Text("Flash Boost Pro") },
-            supportingContent = { Text("Adware detected") }
-        )
-
+        // empty
     }
-
 }
 
-@ReportsPart
+
+//ReportsPart
+@Composable
 fun ReportsScreen() {
 
     Column {
 
-        ListItem(
-            headlineContent = { Text("Scans Done") },
-            supportingContent = { Text("19 completed") }
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black)
+                .padding(16.dp)
+        ) {
+            Text("Reports", color = Color.White)
+        }
 
-        ListItem(
-            headlineContent = { Text("Threats Found") },
-            supportingContent = { Text("247 detected") }
-        )
-
-        ListItem(
-            headlineContent = { Text("Apps Blocked") },
-            supportingContent = { Text("24 blocked") }
-        )
-
+        // empty
     }
+}
+// use for test
+data class AppInfo(
+    val name: String,
+    val packageName: String,
+    val icon: android.graphics.drawable.Drawable
+)
 
+fun getInstalledApps(context: android.content.Context): List<AppInfo> {
+    return emptyList()
 }
