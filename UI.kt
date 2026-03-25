@@ -1,50 +1,31 @@
 package com.example.safescan
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.foundation.layout.statusBarsPadding
+
 
 //bottomPart
 @Composable
@@ -52,9 +33,27 @@ fun SafeScanApp() {
 
     var screen by remember { mutableStateOf("dashboard") }
 
+    var isLoggedIn by remember { mutableStateOf(false) }
+
+    var userAvatar by remember { mutableStateOf<Int?>(null) }
+
     val threatCount by remember { derivedStateOf { ThreatManager.threatCount } }
 
     Scaffold(
+        topBar = {
+            TopBar(
+                isLoggedIn = isLoggedIn,
+                userAvatar = userAvatar,
+                onProfileClick = {
+                    if (isLoggedIn) {
+                        screen = "profile"
+                    } else {
+                        screen = "login"
+                    }
+                }
+            )
+        },
+
         bottomBar = {
             NavigationBar {
 
@@ -115,10 +114,89 @@ fun SafeScanApp() {
                 "quarantine" -> QuarantineScreen()
 
                 "reports" -> ReportsScreen()
+
+                "login" -> LoginScreen(
+                    onLoginSuccess = {
+                        isLoggedIn = true
+                        userAvatar = android.R.drawable.sym_def_app_icon
+                        screen = "dashboard"
+                    }
+                )
+
+                "profile" -> ProfileScreen {
+                    isLoggedIn = false
+                    userAvatar = null
+                    screen = "dashboard"
+                }
+
             }
         }
     }
 }
+//TopBar
+@Composable
+fun TopBar(
+    isLoggedIn: Boolean,
+    userAvatar: Int?,
+    onProfileClick: () -> Unit
+) {
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Text(
+                    text = "SafeScan",
+                    color = Color.White,
+                    fontSize = 20.sp
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                if (isLoggedIn && userAvatar != null) {
+                    Image(
+                        painter = painterResource(userAvatar),
+                        contentDescription = "Avatar",
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .clickable { onProfileClick() }
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Login",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable { onProfileClick() }
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+
 //Dashboard
 @Composable
 fun DashboardScreen(threatCount: Int, onThreatUpdate: (Int) -> Unit) {
@@ -136,14 +214,6 @@ fun DashboardScreen(threatCount: Int, onThreatUpdate: (Int) -> Unit) {
     }
 
     Column(Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black)
-                .padding(16.dp)
-        ) {
-            Text("SafeScan", color = Color.White, fontSize = 20.sp)
-        }
 
         Spacer(Modifier.height(40.dp))
 
@@ -167,14 +237,7 @@ fun DashboardScreen(threatCount: Int, onThreatUpdate: (Int) -> Unit) {
     }
 }
 
-// implication
-object ThreatManager {
-    var threatCount by mutableStateOf(0)
 
-    fun updateThreat(count: Int) {
-        threatCount = count
-    }
-}
 
 
 //ScanPart
@@ -182,15 +245,6 @@ object ThreatManager {
 fun ScanScreen(onStartScan: () -> Unit) {
 
     Column(Modifier.fillMaxSize()) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black)
-                .padding(16.dp)
-        ) {
-            Text("Scan", color = Color.White)
-        }
 
         Spacer(Modifier.height(100.dp))
 
@@ -221,15 +275,6 @@ fun TaskManagerScreen() {
 
     Column {
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black)
-                .padding(16.dp)
-        ) {
-            Text("Task Manager", color = Color.White)
-        }
-
         LazyColumn {
             items(apps) { app ->
                 ListItem(
@@ -252,6 +297,7 @@ fun TaskManagerScreen() {
     }
 }
 
+//Dialog Inside the Taskmanager
 @Composable
 fun AppDetailDialog(app: AppInfo, onClose: () -> Unit) {
 
@@ -299,16 +345,6 @@ fun AppDetailDialog(app: AppInfo, onClose: () -> Unit) {
 fun QuarantineScreen() {
 
     Column {
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black)
-                .padding(16.dp)
-        ) {
-            Text("Quarantine", color = Color.White)
-        }
-
         // empty
     }
 }
@@ -319,26 +355,107 @@ fun QuarantineScreen() {
 fun ReportsScreen() {
 
     Column {
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black)
-                .padding(16.dp)
-        ) {
-            Text("Reports", color = Color.White)
-        }
-
         // empty
     }
 }
-// use for test
+
+//Login
+@Composable
+fun LoginScreen(onLoginSuccess: () -> Unit) {
+
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Spacer(Modifier.height(80.dp))
+
+        Text("Login", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+        Spacer(Modifier.height(40.dp))
+
+        TextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Username") }
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") }
+        )
+
+        Spacer(Modifier.height(30.dp))
+
+        Button(onClick = { onLoginSuccess() }) {
+            Text("Login")
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        Button(onClick = {
+            // TODO: Google login
+        },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_google),
+                contentDescription = "Google Login",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+//Profile
+@Composable
+fun ProfileScreen(onLogout: () -> Unit) {
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Spacer(Modifier.height(100.dp))
+
+        Text("User Profile", fontSize = 24.sp)
+
+        Spacer(Modifier.height(30.dp))
+
+        Button(onClick = onLogout) {
+            Text("Logout")
+        }
+    }
+}
+
+
+
+// implication
+
+// For DashBoard
+object ThreatManager {
+    var threatCount by mutableStateOf(0)
+
+    fun updateThreat(count: Int) {
+        threatCount = count
+    }
+}
+
+// For TaskManager
 data class AppInfo(
     val name: String,
     val packageName: String,
     val icon: android.graphics.drawable.Drawable
 )
-
 fun getInstalledApps(context: android.content.Context): List<AppInfo> {
     return emptyList()
 }
