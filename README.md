@@ -47,15 +47,6 @@ com.emma8047.safescan/
  
 ---
 
-## Roadmap
- 
-- [ ] Background scheduled scans with notifications
-- [ ] Historical score tracking and trend graphs
-- [ ] Real CPU/RAM measurement via `/proc` or `ActivityManager`
-- [ ] Export scan report as PDF
-- [ ] Threat signature database for known malicious package names
----
- 
 ## License
  
 This project is licensed under the MIT License. See [`LICENSE`](LICENSE) for details.
