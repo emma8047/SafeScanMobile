@@ -1,10 +1,22 @@
-apply plugin: "com.android.application"
+/*apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.google.gms.google-services"
+apply plugin: "com.facebook.react"*/
+
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.facebook.react")
+    id("com.google.gms.google-services")
+}
 
 def enableProguardInReleaseBuilds = false
-def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+def jscFlavor = 'io.github.react-native-community:jsc-android:+'
 def hermesEnabled = true
+
+react{
+    
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -12,15 +24,15 @@ android {
     //ndkVersion rootProject.ext.ndkVersion
     //targetSdkVersion rootProject.ext.targetSdkVersion
 
-    namespace "com.safescanmobile"
+    namespace "com.emma8047.safescan"
 
     defaultConfig {
-        applicationId "com.safescanmobile"
+        applicationId "com.emma8047.safescan"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-    }
+    } 
     signingConfigs {
         debug {
             storeFile file('debug.keystore')

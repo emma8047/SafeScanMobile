@@ -12,11 +12,37 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        //maven { url "$rootDir/../node_modules/react-native/android" }
     }
 
     dependencies {
         classpath("com.android.tools.build:gradle:8.3.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.24")
         classpath("com.google.gms:google-services:4.4.1")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // This line is crucial for finding the 'com.facebook.react' plugin
+        maven { url "$rootDir/../node_modules/react-native/android" }
+    }
+}
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                compileSdkVersion rootProject.ext.compileSdkVersion
+                buildToolsVersion rootProject.ext.buildToolsVersion
+                
+                defaultConfig {
+                    minSdkVersion rootProject.ext.minSdkVersion
+                    targetSdkVersion rootProject.ext.targetSdkVersion
+                }
+            }
+        }
     }
 }
