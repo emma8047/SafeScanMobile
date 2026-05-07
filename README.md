@@ -19,8 +19,8 @@ Modern Android devices can accumulate dozens of apps over time, many of which ru
  
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/emma8047/safescan.git
-   cd safescan
+   git clone https://github.com/emma8047/SafeScanMobile.git
+   cd SafeScanMobile
    ```
  
 2. **Open in Android Studio**
