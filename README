@@ -1,0 +1,90 @@
+# SafeScan
+
+## Android Security Monitoring Application
+
+SafeScan is a mobile security application designed to monitor suspicious runtime behaviors on Android devices and help users identify potentially malicious applications in real time.
+
+The application combines Android system-level APIs, background monitoring services, and cloud-based data storage to provide runtime threat analysis and security alerts for users.
+
+---
+
+# Features
+
+- Real-time application behavior monitoring
+- Suspicious activity detection and logging
+- Malware report and threat tracking database
+- Background monitoring services
+- Security alert notifications
+- User authentication and cloud synchronization
+- Application risk visualization interface
+
+---
+
+# Technology Stack
+
+## Application Layer
+- React Native
+- JavaScript
+- TypeScript
+
+## Android Platform Layer
+- Kotlin
+- Android Studio
+- Gradle
+
+## Android System APIs
+- UsageStatsManager API
+- NetworkStatsManager API
+- PackageManager API
+- Intent API
+- WorkManager
+- Broadcast Receivers
+
+## Cloud & Database
+- Firebase Authentication
+- Cloud Firestore
+
+## Version Control
+- Git
+- GitHub
+
+---
+
+# System Architecture
+
+![Architecture Diagram](./architecture.png)
+
+---
+
+# How It Works
+
+SafeScan monitors runtime application activity through Android system APIs and background services. The application analyzes behavioral patterns such as application usage activity, network statistics, and package information to identify potentially suspicious behavior.
+
+Detected events are logged locally and synchronized with cloud storage using Firebase services. Users receive real-time alerts and can review detected risks directly within the application interface.
+
+---
+
+# Key Responsibilities
+
+- Designed and developed the mobile application architecture
+- Implemented Android runtime monitoring functionality
+- Integrated Android system APIs for behavioral analysis
+- Built cloud-connected logging and threat tracking systems
+- Developed background monitoring services and notification systems
+- Created responsive UI components for security visualization
+- Managed version control and collaborative development using GitHub
+
+---
+
+# Future Improvements
+
+- Expand SafeScan to iOS for broader cross-platform compatibility
+- Implement dark mode and accessibility-focused UI enhancements
+- Add guided onboarding and tutorial features for first-time users
+- Enable automatic background scanning for newly downloaded applications
+- Integrate machine learning models for advanced malware detection
+- Improve behavioral analysis accuracy with enhanced monitoring logic
+- Develop advanced analytics dashboards for threat visualization
+
+---
+
